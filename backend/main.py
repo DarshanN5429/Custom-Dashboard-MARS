@@ -13,7 +13,7 @@ from utility.db_connection import Base, engine
 from fastapi.middleware.gzip import GZipMiddleware
 from utility.db_connection import SessionLocal
 from dotenv import load_dotenv
-from apps.views import user_access_views
+from apps.views import (user_access_views, widget_views)
 
 logger = logging.getLogger(__name__)
 load_dotenv()
@@ -96,3 +96,6 @@ async def authentication_middleware(request: Request, call_next):
 
 # Including the router
 app.include_router(user_access_views.router, prefix="/api", tags=["user-access"])
+app.include_router(widget_views.router, prefix="/api", tags=["widgets"])
+
+
