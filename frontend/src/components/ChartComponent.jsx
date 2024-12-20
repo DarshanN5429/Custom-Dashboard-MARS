@@ -2,14 +2,11 @@
 import React from "react";
 import ReactECharts from "echarts-for-react";
 
-const ChartComponent = ({ chartOptions }) => {
+const ChartComponent = ({ chartOptions, dimensions }) => {
   return (
     <ReactECharts
       option={chartOptions}
-      style={{
-        width: "100%",
-        height: "100%",
-      }}
+      style={{ height: `${dimensions.length}px`, width: `${dimensions.width}px`}}
       opts={{
         renderer: "svg",
       }}
