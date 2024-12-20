@@ -12,10 +12,13 @@ from starlette.middleware.sessions import SessionMiddleware
 from utility.db_connection import Base, engine
 from fastapi.middleware.gzip import GZipMiddleware
 from utility.db_connection import SessionLocal
+from dotenv import load_dotenv
+
 
 from apps.views import user_management_views
 
 logger = logging.getLogger(__name__)
+load_dotenv()
 
 
 @asynccontextmanager
@@ -39,7 +42,7 @@ def setup_app():
     fastapi_app.add_middleware(SessionMiddleware, secret_key="fastapi")
     fastapi_app.add_middleware(
         CORSMiddleware,
-        allow_origins=[str(origin) for origin in os.environ["ALLOWED_ORIGIN"]],
+        allow_origins=[str(origin) for origin in os.getenv("ALLOWED_ORIGIN", "")],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
