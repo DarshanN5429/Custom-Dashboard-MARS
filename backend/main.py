@@ -10,7 +10,8 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.inmemory import InMemoryBackend
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from utility.db_connection import SessionLocal
+from utility.db_connection import SessionLocal,Base, engine, get_db
+
 from dotenv import load_dotenv
 from apps.views import (user_access_views, widget_views, dashboard_views)
 
@@ -48,6 +49,9 @@ def setup_app():
 
 
 app = setup_app()
+Base.metadata.create_all(bind=engine)
+
+
 BASE_DIR = Path("/app")
 
 
@@ -94,9 +98,9 @@ async def authentication_middleware(request: Request, call_next):
 
 
 # Including the router
-app.include_router(user_access_views.router, prefix="/api", tags=["user-access"])
-app.include_router(widget_views.router, prefix="/api", tags=["widgets"])
-app.include_router(dashboard_views.router, prefix="/api", tags=["dashboard"])
+app.include_router(user_access_views.router, prefix="/api")
+app.include_router(widget_views.router, prefix="/api")
+app.include_router(dashboard_views.router, prefix="/api")
 
 
 
