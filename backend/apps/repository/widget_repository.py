@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
 from apps.models.widget import Widget
+from sqlalchemy import text
+
 
 def get_all_widgets(db: Session):
     return db.query(Widget).all()
@@ -30,6 +32,11 @@ def delete_widget(db: Session, widget_id: int):
 def get_widget_by_id(db: Session, widget_id: int):
     return db.query(Widget).filter(Widget.id == widget_id).first()
 
-def preview_widget_query(db: Session, query: str):
+def preview_widget_query(db: Session, data: str):
     # This method assumes query execution is safe.
-    return db.execute(query).fetchall()
+    query = text(data["query"])
+    result = db.execute(query)
+    # Fetch the result and convert it to a list of dictionaries
+    columns = result.keys()
+    data = [dict(zip(columns, row)) for row in result.fetchall()]
+    return data

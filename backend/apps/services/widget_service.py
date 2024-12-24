@@ -17,5 +17,5 @@ def remove_widget(db, widget_id):
 def fetch_widget_by_id(db, widget_id):
     return get_widget_by_id(db, widget_id)
 
-def execute_preview_query(db, query):
-    return preview_widget_query(db, query)
+def execute_preview_query(db, data):
+    return preview_widget_query(db, data)

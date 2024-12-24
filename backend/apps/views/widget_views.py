@@ -30,8 +30,10 @@ def delete_widget(widget_id: int, db: Session = Depends(get_db)):
     return {"message": "Widget deleted successfully"}
 
 @router.post("/preview")
-def preview_widget(query: dict, db: Session = Depends(get_db)):
+def preview_widget(data: dict, db: Session = Depends(get_db)):
     try:
-        return execute_preview_query(db, query["query"])
+        # Wrap the raw SQL query in `text()`
+        query_output = execute_preview_query(db, data)
+        return query_output
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(f"Query error : {e}"))
