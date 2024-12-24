@@ -16,6 +16,10 @@ export const createWidget = async (widget) => {
     const response = await apiClient.post('/widgets', widget);
     return response.data;
 };
+export const previewWidget = async (widget) => {
+    const response = await apiClient.post('/widgets/preview', widget);
+    return response.data;
+};
 
 export const updateWidget = async (id, widget) => {
     const response = await apiClient.put(`/widgets/${id}`, widget);

@@ -8,7 +8,7 @@ const WidgetConfig = () => {
   const handlePreview = (widgetData) => {
     setPreviewData({
       ...widgetData,
-      chartType: widgetData.chartType || 'Sales-Pie',
+      chart_type: widgetData.chart_type || 'Sales-Pie',
     });
   };
 

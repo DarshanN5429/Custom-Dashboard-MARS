@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { createWidget } from '../utils/api';
+import { createWidget, previewWidget } from '../utils/api';
 
 const chart_types = ['Sales-Pie', 'Revenue-Bar', 'Growth-Line'];
 
@@ -64,7 +64,7 @@ const CreateWidget = ({ onSaveEdit, editData, onPreview,setWidgets }) => {
     }
   };
   
-  const handlePreview = () => {
+  const handlePreview = async() => {
     const data = {
       name,
       description,
@@ -74,6 +74,8 @@ const CreateWidget = ({ onSaveEdit, editData, onPreview,setWidgets }) => {
       query,
     };
     onPreview(data);
+    await previewWidget(data);
+    toast.success('Widget Preview successfully!');
   };
 
   return (
