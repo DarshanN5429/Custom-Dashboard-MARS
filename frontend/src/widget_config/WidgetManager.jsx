@@ -3,41 +3,63 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import CreateWidget from './CreateWidget';
 import WidgetList from './WidgetList';
+import { fetchWidgets, updateWidget, deleteWidget } from '../utils/api';
 
-const WidgetManager = ({onPreview}) => {  
+const WidgetManager = ({ onPreview }) => {
+  const [widgets, setWidgets] = useState([]);
   const [editData, setEditData] = useState(null);
 
   useEffect(() => {
-    // Initialize session storage if not already set
-    if (!sessionStorage.getItem('widgetData')) {
-      sessionStorage.setItem('widgetData', JSON.stringify([]));
-    }
+    const loadWidgets = async () => {
+      try {
+        const data = await fetchWidgets();
+        setWidgets(data);
+      } catch (error) {
+        toast.error('Failed to fetch widgets');
+        console.error(error);
+      }
+    };
+
+    loadWidgets();
   }, []);
 
   const handleEdit = (widget, index) => {
     setEditData({ widget, index });
   };
 
-  const handleSaveEdit = (updatedWidget, index) => {
-    const widgets = JSON.parse(sessionStorage.getItem('widgetData')) || [];
-    widgets[index] = updatedWidget;
-    sessionStorage.setItem('widgetData', JSON.stringify(widgets));
-    setEditData(null);
-    toast.success('Widget updated successfully!');
+  const handleSaveEdit = async (updatedWidget, index) => {
+    try {
+      const id = widgets[index].id;
+      await updateWidget(id, updatedWidget);
+      const updatedWidgets = [...widgets];
+      updatedWidgets[index] = updatedWidget;
+      setWidgets(updatedWidgets);
+      setEditData(null);
+      toast.success('Widget updated successfully!');
+    } catch (error) {
+      toast.error('Failed to update widget');
+      console.error(error);
+    }
   };
 
-  const handleDelete = (index) => {
-    const widgets = JSON.parse(sessionStorage.getItem('widgetData')) || [];
-    widgets.splice(index, 1);
-    sessionStorage.setItem('widgetData', JSON.stringify(widgets));
-    toast.info('Widget deleted successfully!');
+  const handleDelete = async (index) => {
+    try {
+      const id = widgets[index].id;
+      await deleteWidget(id);
+      const updatedWidgets = widgets.filter((_, i) => i !== index);
+      setWidgets(updatedWidgets);
+      toast.info('Widget deleted successfully!');
+    } catch (error) {
+      toast.error('Failed to delete widget');
+      console.error(error);
+    }
   };
 
   return (
     <div className="w-1/2 ">
       <ToastContainer />
-      <CreateWidget onSaveEdit={handleSaveEdit} editData={editData} onPreview={onPreview} />
-      <WidgetList onEdit={handleEdit} onDelete={handleDelete} />
+      <CreateWidget onSaveEdit={handleSaveEdit} editData={editData} onPreview={onPreview} setWidgets={setWidgets} />
+      <WidgetList widgets={widgets} onEdit={handleEdit} onDelete={handleDelete} />
     </div>
   );
 };

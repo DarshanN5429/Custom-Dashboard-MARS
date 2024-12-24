@@ -1,15 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css"; // Import the CSS for the tooltip
 
-const WidgetList = ({ onEdit, onDelete }) => {
-  const [widgets, setWidgets] = React.useState([]);
-
-  useEffect(() => {
-    const savedWidgets = JSON.parse(sessionStorage.getItem("widgetData")) || [];
-    setWidgets(savedWidgets);
-  }, []);
+const WidgetList = ({ onEdit, onDelete, widgets }) => {
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md mx-auto mt-6">
@@ -24,7 +18,7 @@ const WidgetList = ({ onEdit, onDelete }) => {
               className="flex justify-between items-center border-b pb-2"
             >
               <div>
-                <p className="font-medium">{widget.widgetName}</p>
+                <p className="font-medium">{widget.name}</p>
                 <p className="text-sm text-gray-500">{widget.description}</p>
               </div>
               <div className="flex gap-2 items-center">

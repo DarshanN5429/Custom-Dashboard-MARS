@@ -5,7 +5,7 @@ from apps.services.widget_service import (
     fetch_all_widgets, add_widget, modify_widget, remove_widget, fetch_widget_by_id, execute_preview_query
 )
 
-router = APIRouter(prefix="/api/widgets", tags=["Widgets"])
+router = APIRouter(prefix="/widgets", tags=["Widgets"])
 
 @router.get("/")
 def get_all_widgets(db: Session = Depends(get_db)):

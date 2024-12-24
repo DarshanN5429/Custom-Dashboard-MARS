@@ -1,82 +1,83 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { createWidget } from '../utils/api';
 
-const chartTypes = ['Sales-Pie', 'Revenue-Bar', 'Growth-Line'];
+const chart_types = ['Sales-Pie', 'Revenue-Bar', 'Growth-Line'];
 
-const CreateWidget = ({ onSaveEdit, editData,onPreview
-
-}) => {
-  const [widgetName, setWidgetName] = useState('');
+const CreateWidget = ({ onSaveEdit, editData, onPreview,setWidgets }) => {
+  const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [dimensions, setDimensions] = useState({ length: '', width: '' });
-  const [chartType, setChartType] = useState(chartTypes[0]);
+  const [chart_type, setChart_type] = useState(chart_types[0]);
+  const [length, setLength] = useState(300);
+  const [width, setWidth] = useState(300);
   const [query, setQuery] = useState('');
 
   useEffect(() => {
     if (editData) {
       const { widget } = editData;
-      setWidgetName(widget.widgetName);
+      setName(widget.name);
       setDescription(widget.description);
-      setDimensions(widget.dimensions);
-      setChartType(widget.chartType);
+      setLength(widget.length);
+      setWidth(widget.width);
+      setChart_type(widget.chart_type);
       setQuery(widget.query);
     }
   }, [editData]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const newWidget = {
-      widgetName,
+      name,
       description,
-      dimensions: {
-        length: Number(dimensions.length) || 300,
-        width: Number(dimensions.width) || 300,
-      },
-      chartType,
+      length,
+      width,
+      chart_type,
       query,
     };
 
-    const widgets = JSON.parse(sessionStorage.getItem('widgetData')) || [];
-
-    if (editData) {
-      // Save edits
-      onSaveEdit(newWidget, editData.index);
-    } else {
-      // Save new widget
-      widgets.push(newWidget);
-      sessionStorage.setItem('widgetData', JSON.stringify(widgets));
-      toast.success('Widget created successfully!');
+    try {
+      if (editData) {
+        onSaveEdit(newWidget, editData.index);
+      } else {
+        const createdWidget = await createWidget(newWidget);
+        setWidgets((prevWidgets) => [...prevWidgets, createdWidget]);
+        toast.success('Widget created successfully!');
+      }
+      setName('');
+      setDescription('');
+      setLength();
+      setWidth();
+      setChart_type(chart_types[0]);
+      setQuery('');
+    } catch (error) {
+      console.error('Error creating widget:', error);
+      toast.error('Failed to create widget. Please try again.');
     }
-
-    // Clear fields
-    setWidgetName('');
-    setDescription('');
-    setDimensions({ length: '', width: '' });
-    setChartType(chartTypes[0]);
-    setQuery('');
   };
+
   const handleDimensionChange = (e) => {
     const { name, value } = e.target;
-    setDimensions((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  
+    if (name === 'length') {
+      setLength(value);
+    } else if (name === 'width') {
+      setWidth(value);
+    }
   };
+  
   const handlePreview = () => {
     const data = {
-      widgetName,
+      name,
       description,
-      dimensions: {
-        length: dimensions.length || 300,
-        width: dimensions.width || 300,
-      },
-      chartType,
+      length,
+      width,
+      chart_type,
       query,
     };
     onPreview(data);
   };
-  
+
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md  mx-auto">
+    <div className="bg-white p-4 rounded-lg shadow-md mx-auto">
       <h2 className="text-xl font-bold mb-4 text-gray-800">
         {editData ? 'Edit Widget' : 'Create Widget'}
       </h2>
@@ -87,8 +88,8 @@ const CreateWidget = ({ onSaveEdit, editData,onPreview
           </label>
           <input
             type="text"
-            value={widgetName}
-            onChange={(e) => setWidgetName(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             className="w-full p-2 border rounded"
             placeholder="Enter widget name"
           />
@@ -112,7 +113,7 @@ const CreateWidget = ({ onSaveEdit, editData,onPreview
             <input
               type="text"
               name="length"
-              value={dimensions.length}
+              value={length}
               onChange={handleDimensionChange}
               className="w-1/2 p-2 border rounded"
               placeholder="Length"
@@ -120,7 +121,7 @@ const CreateWidget = ({ onSaveEdit, editData,onPreview
             <input
               type="text"
               name="width"
-              value={dimensions.width}
+              value={width}
               onChange={handleDimensionChange}
               className="w-1/2 p-2 border rounded"
               placeholder="Width"
@@ -132,11 +133,11 @@ const CreateWidget = ({ onSaveEdit, editData,onPreview
             Chart Type
           </label>
           <select
-            value={chartType}
-            onChange={(e) => setChartType(e.target.value)}
+            value={chart_type}
+            onChange={(e) => setChart_type(e.target.value)}
             className="w-full p-2 border rounded"
           >
-            {chartTypes.map((type) => (
+            {chart_types.map((type) => (
               <option key={type} value={type}>
                 {type}
               </option>
@@ -145,17 +146,17 @@ const CreateWidget = ({ onSaveEdit, editData,onPreview
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Query/Endpoint
+            Query
           </label>
           <textarea
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full p-2 border rounded"
-            placeholder="Enter SQL query or API endpoint"
+            placeholder="Enter SQL query"
           />
         </div>
         <div className="flex justify-end gap-2">
-        <button
+          <button
             type="button"
             onClick={handlePreview}
             className="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 transition"
