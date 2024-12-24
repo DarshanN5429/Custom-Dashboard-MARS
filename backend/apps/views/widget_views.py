@@ -32,7 +32,6 @@ def delete_widget(widget_id: int, db: Session = Depends(get_db)):
 @router.post("/preview")
 def preview_widget(data: dict, db: Session = Depends(get_db)):
     try:
-        # Wrap the raw SQL query in `text()`
         query_output = execute_preview_query(db, data)
         return query_output
     except Exception as e:

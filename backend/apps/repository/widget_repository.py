@@ -33,7 +33,6 @@ def get_widget_by_id(db: Session, widget_id: int):
     return db.query(Widget).filter(Widget.id == widget_id).first()
 
 def preview_widget_query(db: Session, data: str):
-    # This method assumes query execution is safe.
     query = text(data["query"])
     result = db.execute(query)
     # Fetch the result and convert it to a list of dictionaries
