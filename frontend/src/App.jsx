@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { Layout } from "antd";
 import DashboardConfig from "./dashboard_config";
 import WidgetConfig from "./widget_config";
+import LandingPage from "./landing_page";
 
 const { Header, Content } = Layout;
 
@@ -35,7 +36,7 @@ const App = () => {
         {/* Main Content */}
         <Content className="p-6">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<LandingPage />} />
             <Route path="/dashboard" element={<DashboardConfig />} />
             <Route path="/widget" element={<WidgetConfig />} />
           </Routes>
