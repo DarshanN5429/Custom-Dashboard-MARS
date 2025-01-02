@@ -30,3 +30,14 @@ export const deleteWidget = async (id) => {
     const response = await apiClient.delete(`/widgets/${id}`);
     return response.data;
 };
+
+export const saveDashboard = async (dashboard) => {
+    const response = await apiClient.post('/dashboard/layout', dashboard);
+    return response.data;
+};
+
+export const fetchDashboard = async () => {
+    const response = await apiClient.get('/dashboard/fetch-widget');
+    return response.data;
+};
+

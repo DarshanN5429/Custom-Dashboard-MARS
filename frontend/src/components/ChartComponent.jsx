@@ -1,16 +1,19 @@
-// This component will render the charts (Pie, Bar, and Line):
 import React from "react";
 import ReactECharts from "echarts-for-react";
 
 const ChartComponent = ({ chartOptions, dimensions }) => {
+  const { width = 300, height = 300 } = dimensions;
+
   return (
-    <ReactECharts
-      option={chartOptions}
-      style={{ height: `${dimensions.length}px`, width: `${dimensions.width}px`}}
-      opts={{
-        renderer: "svg",
-      }}
-    />
+    <div style={{ width: `${width}px`, height: `${height}px` }}>
+      <ReactECharts
+        option={chartOptions}
+        style={{ height: "100%", width: "100%" }}
+        opts={{
+          renderer: "svg",
+        }}
+      />
+    </div>
   );
 };
 

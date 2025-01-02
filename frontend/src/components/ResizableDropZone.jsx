@@ -37,7 +37,7 @@ const ResizableDropZone = ({ id, size, onDrop, onResizeStop }) => {
     if (!onDrop) {
       return <span className="text-gray-400">Drop a chart or KPI here</span>;
     }
-
+console.log("Ondrop", onDrop )
     switch (onDrop.type) {
       case "kpi":
         return <KPIComponent data={onDrop} />;
@@ -46,7 +46,10 @@ const ResizableDropZone = ({ id, size, onDrop, onResizeStop }) => {
       case "pie":
       case "bar":
       case "line":
-        return <ChartComponent chartOptions={onDrop} />;
+        return <ChartComponent chartOptions={onDrop} dimensions={{
+          width: 300,
+          length: 300,
+        }}/>;
       default:
         return (
           <span className="text-red-500">

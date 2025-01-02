@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { createWidget, previewWidget } from '../utils/api';
-
-const chart_types = ['Sales-Pie', 'Revenue-Bar', 'Growth-Line'];
+const chart_types = ['Sales-Pie', 'Revenue-Bar', 'Growth-Line', 'KPI', 'Table'];
 
 const CreateWidget = ({ onSaveEdit, editData, onPreview,setWidgets }) => {
   const [name, setName] = useState('');
@@ -64,7 +63,7 @@ const CreateWidget = ({ onSaveEdit, editData, onPreview,setWidgets }) => {
     }
   };
   
-  const handlePreview = async() => {
+  const handlePreview = async () => {
     const data = {
       name,
       description,
@@ -73,10 +72,15 @@ const CreateWidget = ({ onSaveEdit, editData, onPreview,setWidgets }) => {
       chart_type,
       query,
     };
-    onPreview(data);
-    await previewWidget(data);
-    toast.success('Widget Preview successfully!');
+    try {
+      onPreview(data); 
+      await previewWidget(data);
+      toast.success('Widget previewed successfully!');
+    } catch (error) {
+      toast.error('Failed to preview widget. Please try again.');
+    }
   };
+  
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md mx-auto">

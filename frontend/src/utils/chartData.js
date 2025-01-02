@@ -51,7 +51,7 @@ export const chartOptions = {
       },
     ],
   },
-  "Employee-Table": {
+  "Table": {
     type: "table",
     headers: ["City", "Population", "Country"],
     rows: [
@@ -60,12 +60,16 @@ export const chartOptions = {
       ["London", "9M", "UK"],
     ],
   },
-  "Traffic-KPI": {
-    type: "kpi",
-    title: "Website Traffic",
-    value: "1.5M",
-    change: "-5%",
-  },
+  "KPI": {
+    "type": "kpi",
+    "label": "Website Traffic",
+    "value": "1.5M",
+    "goal": "2M",
+    "previousValue": "1.6M",
+    "percentageChange": -5,
+    "lastUpdated": "01/02/2025"
+  }
+  ,
 
   // Additional Examples with completely new data
   "Product-Pie": {

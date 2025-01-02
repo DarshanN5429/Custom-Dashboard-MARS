@@ -2,18 +2,18 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from utility.db_connection import get_db
 from apps.services.dashboard_service import (
-    get_widgets_for_user,
+    get_dashboard,
     get_widget_data,
     store_dashboard_layout
 )
 
-router = APIRouter(prefix="/api", tags=["Dashboard"])
+router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
-@router.post("/fetch-widget")
-def fetch_widget(user_id: int, db: Session = Depends(get_db)):
-    widgets = get_widgets_for_user(db, user_id)
+@router.get("/fetch-widget")
+def fetch_widget(db: Session = Depends(get_db)):
+    widgets = get_dashboard(db)
     if not widgets:
-        raise HTTPException(status_code=404, detail="No widgets found for the user")
+        raise HTTPException(status_code=404, detail="No widgets found")
     return widgets
 
 @router.post("/fetch-widget-data/{widget_id}")
@@ -27,7 +27,7 @@ def fetch_widget_data(widget_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.post("/dashboardlayout")
-def save_dashboard_layout(user_id: int, positions: dict, db: Session = Depends(get_db)):
-    layout = store_dashboard_layout(db, user_id, positions)
+@router.post("/layout")
+def save_dashboard_layout_endpoint(positions: dict, db: Session = Depends(get_db)):
+    layout = store_dashboard_layout(db, positions)
     return {"message": "Layout saved successfully", "layout": layout}
