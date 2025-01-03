@@ -31,8 +31,8 @@ export const deleteWidget = async (id) => {
     return response.data;
 };
 
-export const saveDashboard = async (dashboard) => {
-    const response = await apiClient.post('/dashboard/layout', dashboard);
+export const saveDashboard = async (dashboardData) => {
+    const response = await apiClient.post('/dashboard/layout', dashboardData);
     return response.data;
 };
 

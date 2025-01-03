@@ -9,11 +9,12 @@ def fetch_dashboard(db: Session):
 def fetch_widget_data(db: Session, widget_id: int):
     widget = db.query(Widget).filter(Widget.id == widget_id).first()
     return widget.query if widget else None
-
+    
 def save_dashboard_layout(db: Session, positions: dict):
     dashboard = db.query(Dashboard).first()
     if dashboard:
-        dashboard.positions = positions
+        updated_positions = {**dashboard.positions, **positions} if dashboard.positions else positions
+        dashboard.positions = updated_positions  
     else:
         dashboard = Dashboard(positions=positions)
         db.add(dashboard)

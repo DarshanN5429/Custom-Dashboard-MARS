@@ -6,7 +6,17 @@ import {
   PointerSensor,
   TouchSensor,
 } from "@dnd-kit/core";
-import { Layout, Button, Card, Typography, Space, Divider } from "antd";
+import {
+  Layout,
+  Button,
+  Card,
+  Typography,
+  Space,
+  Divider,
+  Input,
+  Modal,
+  message,
+} from "antd";
 import {
   SaveOutlined,
   DragOutlined,
@@ -16,8 +26,6 @@ import DraggableItems from "../components/DraggableItems";
 import DropZones from "../components/DropZones";
 import { chartOptions } from "../utils/chartData";
 import { saveDashboard } from "../utils/api";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -27,6 +35,10 @@ const DashboardConfig = () => {
   const [dropZones, setDropZones] = useState([
     { id: "dropzone-1", width: 300, height: 300 },
   ]);
+  const [dashboardName, setDashboardName] = useState("");
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [nameError, setNameError] = useState("");
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(TouchSensor, {
@@ -39,8 +51,6 @@ const DashboardConfig = () => {
 
   const handleDrop = (event) => {
     const { active, over } = event;
-    console.log("active: " , active)
-    console.log("over: " , over)
     if (over && active.id !== over.id) {
       if (chartOptions[active.id]) {
         const dropZoneId = over.id;
@@ -63,6 +73,7 @@ const DashboardConfig = () => {
 
           return newDroppedItems;
         });
+        
         setDropZones((prevZones) =>
           prevZones.map((zone) =>
             zone.id === dropZoneId ? { ...zone, name: chartId } : zone
@@ -92,7 +103,20 @@ const DashboardConfig = () => {
     );
   };
 
+  const validateDashboardName = (name) => {
+    if (!name.trim()) {
+      setNameError("Dashboard name is required");
+      return false;
+    }
+    setNameError("");
+    return true;
+  };
+
   const handleSaveDashboard = async () => {
+    if (!validateDashboardName(dashboardName)) {
+      return;
+    }
+
     const gridUnit = 100;
     const positions = dropZones.reduce((acc, zone, index) => {
       const widgetName = droppedItems[zone.id]?.name || "graph";
@@ -114,44 +138,51 @@ const DashboardConfig = () => {
     const updatedPositions = { ...positions };
     delete updatedPositions[keys[keys.length - 1]];
 
+    const dashboardData = {
+      [dashboardName]: {
+        positions: updatedPositions
+      }
+    };
+
     try {
-      await saveDashboard(updatedPositions);
-      toast.success("Dashboard saved successfully!");
+      await saveDashboard(dashboardData);
+      message.success("Dashboard saved successfully!");
+      setIsSaveModalOpen(false);
+      setDashboardName("");
     } catch (err) {
-      toast.error("Failed to save the dashboard.");
+      message.error("Failed to save the dashboard.");
     }
   };
 
   return (
-    <Layout className="min-h-screen bg-gray-50">
-      <Header className="bg-white shadow-sm px-6 flex items-center justify-between">
+    <Layout className="min-h-screen">
+      <Header className="bg-white px-6 flex items-center justify-between">
         <Space>
-          <LayoutOutlined className="text-lg text-blue-600" />
-          <Title level={4} className="!mb-0">
+          <LayoutOutlined className="text-blue-600" />
+          <Title level={4} style={{ margin: 0 }}>
             Dashboard Configuration
           </Title>
         </Space>
         <Button
           type="primary"
           icon={<SaveOutlined />}
-          onClick={handleSaveDashboard}
-          className="bg-blue-600"
+          onClick={() => setIsSaveModalOpen(true)}
         >
           Save Dashboard
         </Button>
       </Header>
 
-      <Layout className="bg-transparent">
+      <Layout>
         <DndContext sensors={sensors} onDragEnd={handleDrop}>
           <Sider
             width={280}
             theme="light"
-            className="overflow-hidden shadow-sm border-r border-gray-200"
+            className="border-r border-gray-200"
           >
             <div className="p-4">
               <Space className="mb-4">
                 <DragOutlined className="text-gray-600" />
-                <Title level={5} className="!mb-0">
+                <Title level={5} style={{ margin: 0 }}>
                   Available Widgets
                 </Title>
               </Space>
@@ -163,7 +194,7 @@ const DashboardConfig = () => {
           </Sider>
 
           <Content className="p-6">
-            <Card className="w-full h-full bg-white shadow-sm">
+            <Card className="w-full h-full">
               <div className="overflow-auto h-[calc(100vh-200px)]">
                 <DropZones
                   dropZones={dropZones}
@@ -175,6 +206,34 @@ const DashboardConfig = () => {
           </Content>
         </DndContext>
       </Layout>
+
+      <Modal
+        title="Save Dashboard"
+        open={isSaveModalOpen}
+        onCancel={() => setIsSaveModalOpen(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setIsSaveModalOpen(false)}>
+            Cancel
+          </Button>,
+          <Button key="save" type="primary" onClick={handleSaveDashboard}>
+            Save
+          </Button>
+        ]}
+      >
+        <div style={{ marginTop: 16 }}>
+          <div>
+            <label className="block mb-2">Dashboard Name</label>
+            <Input
+              value={dashboardName}
+              onChange={(e) => setDashboardName(e.target.value)}
+              placeholder="Enter dashboard name"
+            />
+            {nameError && (
+              <p className="text-red-500 text-sm mt-1">{nameError}</p>
+            )}
+          </div>
+        </div>
+      </Modal>
     </Layout>
   );
 };
